@@ -7,7 +7,6 @@ import java.util.List;
 
 public class AccountService {
     private AccountRepository accountRepository = new AccountRepository();
-
     public void addAccount(Account account) {
         accountRepository.addAccount(account);
     }

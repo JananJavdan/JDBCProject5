@@ -1,9 +1,7 @@
 package jdbc.repository;
-
 import jdbc.config.MySQLConfig;
 import jdbc.model.Account;
 import jdbc.model.UserDetail;
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,8 +13,8 @@ public class UserDetailRepository {
                 "VALUES (?, ?, ?, ?)";
 
         try (Connection connection = MySQLConfig.getConnection()) {
-
             PreparedStatement statement = connection.prepareStatement(query);
+
             statement.setString(1, userDetail.getFirstName());
             statement.setString(2, userDetail.getLastName());
             statement.setString(3, userDetail.getEmail());
@@ -29,25 +27,24 @@ public class UserDetailRepository {
         }
     }
 
-    public UserDetail getUserDetail(Account account) {
-        String query = "SELECT * FROM userDetail WHERE accountUerName=" + account.getUsername();
+    public UserDetail getUserDetail(String username) {
+        String query = "SELECT * FROM userDetail WHERE accountUserName = ?";
+
         try (Connection connection = MySQLConfig.getConnection()) {
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(query);
+
             if (resultSet.next()) {
-                return new UserDetail(
-                        resultSet.getString("firstname"),
-                        resultSet.getString("lastname"),
-                        resultSet.getString("email"),
-                        (Account) resultSet.getObject("accountUserName")
-                );
+                        String firstName = resultSet.getString("firstname");
+                        String lastName = resultSet.getString("lastname");
+                        String email = resultSet.getString("email");
+                        return new UserDetail(firstName, lastName, email,null);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return null;
     }
-
     public List<UserDetail> getAllUserDetail() {
         List<UserDetail> userDetailList = new ArrayList<>();
 
@@ -58,12 +55,10 @@ public class UserDetailRepository {
              ResultSet resultSet = statement.executeQuery(query)) {
 
             while (resultSet.next()) {
-                userDetailList.add(new UserDetail(
-                        resultSet.getString("firstname"),
-                        resultSet.getString("lastname"),
-                        resultSet.getString("email"),
-                        (Account) resultSet.getObject("accountUserName"))
-                );
+                String firstName = resultSet.getString("firstname");
+                String lastName = resultSet.getString("lastname");
+                String email = resultSet.getString("email");
+                userDetailList.add(new UserDetail(firstName, lastName, email,null));
             }
             if (userDetailList.size()>0)
                 return userDetailList;
@@ -73,7 +68,6 @@ public class UserDetailRepository {
         }
         return Collections.emptyList();
     }
-
 
     public void deleteUserDetail(int userId) {
         String query = "DELETE FROM userDetail WHERE userId = ?";
